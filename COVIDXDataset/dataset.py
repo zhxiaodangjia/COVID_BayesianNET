@@ -1,10 +1,10 @@
 import os
 import torch
 from torch.utils.data import Dataset
-import glob
+#import glob
 import numpy as np
 import random as ra
-from utils import read_filepaths
+from utils.util import read_filepaths
 from PIL import Image, ImageOps
 import cv2
 from matplotlib import cm
@@ -55,8 +55,8 @@ class COVIDxDataset(Dataset):
         self.CLASSES = n_classes
         self.dim = dim
         self.COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
-        testfile = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/test_split_fold_4.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/test_split_v2.txt'#'./test_split_v2.txt'
-        trainfile = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/train_split_fold_4.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/train_split_v2.txt'#'./train_split_v2.txt'
+        testfile = '/home/byo/Documents/Experiments_COVID/COVID_BayesianNET/Experiment/test_split_fold_0.txt'
+        trainfile = '/home/byo/Documents/Experiments_COVID/COVID_BayesianNET/Experiment/train_split_fold_0.txt'
         if (mode == 'train'):
             self.paths, self.labels = read_filepaths(trainfile)
         elif (mode == 'test'):

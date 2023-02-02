@@ -130,3 +130,5 @@ dmypy.json
 
 #Others
 .DS_Store
+/models_saved
+/Data

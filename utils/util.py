@@ -94,7 +94,7 @@ def save_model(model,optimizer, args, metrics, epoch, best_pred_loss,confusion_m
 
 def load_model(args):
     checkpoint = torch.load(args.saved_model)
-    model = select_model(args)
+    model,bflag = select_model(args)
     model.load_state_dict(checkpoint['state_dict'])
 
     if (args.cuda):
@@ -103,7 +103,7 @@ def load_model(args):
     optimizer = select_optimizer(args,model)
     optimizer.load_state_dict(checkpoint['optimizer'])
     epoch = checkpoint['epoch']
-    return model, optimizer, epoch
+    return model, optimizer, epoch, bflag
 
 
 def make_dirs(path):
