@@ -237,7 +237,7 @@ def initialize_from_saved_model(args):
     #------ Class weigths for sampling and for loss function -----------------------------------
     labels = np.unique(train_loader.labels)
     #print(labels)
-    class_weight = compute_class_weight('balanced', labels, train_loader.labels)
+    class_weight = compute_class_weight(class_weight='balanced', classes=labels, y=train_loader.labels)
     class_weight = class_weight[::-1]
     #class_weight[2]=50
     #weights = torch.DoubleTensor(class_weight.copy())
