@@ -1,7 +1,6 @@
 import torch
 import torchvision
 from bayesian_torch.models.dnn_to_bnn import dnn_to_bnn
-from utils.util import select_model
 
 const_bnn_prior_parameters = {
         "prior_mu": 0.0,
