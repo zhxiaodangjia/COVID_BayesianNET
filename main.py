@@ -59,7 +59,7 @@ def get_arguments():
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--log_interval', type=int, default=1000)
     parser.add_argument('--dataset_name', type=str, default="COVIDx")
-    parser.add_argument('--nEpochs', type=int, default=20)
+    parser.add_argument('--nEpochs', type=int, default=24)
     parser.add_argument('--n_monte_carlo', type=int, default=20, help='number of Monte Carlo runs during training')
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--seed', type=int, default=123)
@@ -73,14 +73,15 @@ def get_arguments():
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: none)')
     parser.add_argument('--model', type=str, default='',
-                        choices=('COVIDNet','CovidNet_ResNet50', 'CovidNet_DenseNet', 'CovidNet_Grad_CAM','CovidNet_DE'))
+                        choices=('DenseNet','BDenseNet','EfficientNet','BEfficientNet'))
+    parser.add_argument('--init_from', action='store_true', default=False)
     parser.add_argument('--opt', type=str, default='adam',
                         choices=('sgd', 'adam', 'rmsprop'))
-    parser.add_argument('--dataset', type=str, default='/content/covid-chestxray-dataset/data',
+    parser.add_argument('--dataset', type=str, default='data/',
                         help='path to dataset ')
-    parser.add_argument('--saved_model', type=str, default='/home/julian/Documents/PythonExperiments/COVIDNet/ModelSavedCoviNet/COVIDNet20200406_0412/COVIDNet_best_checkpoint.pth.tar',
+    parser.add_argument('--saved_model', type=str, default='COVID_BayesianNET/models_saved/Model_best_checkpoint.pth.tar',
                         help='path to save_model ')
-    parser.add_argument('--save', type=str, default='/home/julian/Documents/PythonExperiments/COVIDNet/ModelSavedCoviNet/COVIDNet' + util.datestr(),
+    parser.add_argument('--save', type=str, default='COVID_BayesianNET/models_saved/Model_' + util.datestr(),
                         help='path to checkpoint ')
     args = parser.parse_args()
     return args

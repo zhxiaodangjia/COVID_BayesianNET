@@ -93,8 +93,8 @@ def save_model(model,optimizer, args, metrics, epoch, best_pred_loss,confusion_m
     return best_pred_loss
 
 def load_model(args):
-    checkpoint = torch.load(args.saved_model)
-    model = select_model(args)
+    checkpoint = torch.load(args.saved_model,map_location=torch.device('cpu'))
+    model,_ = select_model(args)
     model.load_state_dict(checkpoint['state_dict'])
 
     if (args.cuda):
@@ -149,13 +149,19 @@ def read_filepaths(file):
 
 def select_model(args):
     if args.model == 'BDenseNet':
-        return BDenseNet(args.classes), True #Flag: True: Bayesian model, False: Frequentist model
+        if args.init_from:
+            return BDenseNet(n_classes = args.classes, saved_model = args.saved_model), True
+        else:
+            return BDenseNet(args.classes), True #Flag: True: Bayesian model, False: Frequentist model
     elif args.model == 'DenseNet':
-        return DenseNet(args.classes), False
+        return DenseNet(n_classes = args.classes), False
     elif args.model == 'EfficientNet':
-        return EfficientNet(args.classes), False
+        return EfficientNet(n_classes = args.classes), False
     elif args.model == 'BEfficientNet':
-        return BEfficientNet(args.classes), True
+        if args.init_from:
+            return BEfficientNet(n_classes = args.classes, saved_model = args.saved_model), True
+        else:
+            return BEfficientNet(n_classes = args.classes), True
 
 
 

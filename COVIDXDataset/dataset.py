@@ -55,8 +55,8 @@ class COVIDxDataset(Dataset):
         self.CLASSES = n_classes
         self.dim = dim
         self.COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
-        testfile = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/test_split_fold_4.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/test_split_v2.txt'#'./test_split_v2.txt'
-        trainfile = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/train_split_fold_4.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/train_split_v2.txt'#'./train_split_v2.txt'
+        testfile = 'COVID_BayesianNET/Experiment/test_split_fold_0.txt'
+        trainfile = 'COVID_BayesianNET/Experiment/train_split_fold_0.txt'
         if (mode == 'train'):
             self.paths, self.labels = read_filepaths(trainfile)
         elif (mode == 'test'):
@@ -70,7 +70,7 @@ class COVIDxDataset(Dataset):
 
     def __getitem__(self, index):
         #index = int(index/2)
-        image_tensor = self.load_image(self.root + self.paths[index], self.dim)
+        image_tensor = self.load_image(self.root + self.paths[index])
         label_tensor = torch.tensor(self.COVIDxDICT[self.labels[index]], dtype=torch.long)
         image_tensor = image_tensor.numpy()
 
@@ -101,7 +101,7 @@ class COVIDxDataset(Dataset):
             final_tensor = torch.FloatTensor(image_tensor)
         return final_tensor, label_tensor
 
-    def load_image(self, img_path, dim):
+    def load_image(self, img_path):
         if not os.path.exists(img_path):
             print("IMAGE DOES NOT EXIST {}".format(img_path))
         image = cv2.imread(img_path)
@@ -114,8 +114,8 @@ class COVIDxDataset(Dataset):
         img_adapteq = ImageOps.equalize(img_adapteq,mask=mask)
 
         preprocess = transforms.Compose([
-            transforms.Resize(224),
-            transforms.CenterCrop(224),
+            transforms.Resize(self.dim[0]),
+            transforms.CenterCrop(self.dim[0]),
             transforms.ToTensor(),#normaliza a [0,1]
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             ])
