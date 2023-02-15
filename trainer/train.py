@@ -27,7 +27,7 @@ def initialize(args):
     #------ Class weigths for sampling and for loss function -----------------------------------
     labels = np.unique(train_loader.labels)
     print(labels)
-    class_weight = compute_class_weight('balanced', labels, train_loader.labels)
+    class_weight = compute_class_weight(class_weight='balanced', classes=labels, y=train_loader.labels)
     #weights_sample = compute_sample_weight('balanced',train_loader.labels)
     #print(np.unique(weights_sample))
     #---------- Alphabetical order in labels does not correspond to class order in COVIDxDataset-----
@@ -83,9 +83,6 @@ def train(args, model, trainloader, optimizer, epoch, class_weight):
         output = model(input_data)
         #print(output.shape)
         #print(target.shape)
-        #loss = focal_loss(output, target)
-        if args.model == 'CovidNet_DenseNet':
-                output = output[-1]
         
         loss = crossentropy_loss(output, target,weight=class_weight)
         loss.backward()
@@ -175,13 +172,11 @@ def validation(args, model, testloader, epoch, class_weight):
                 target = target.cuda()
             #print(input_data.shape)
             output = model(input_data)
-            if args.model == 'CovidNet_DenseNet':
-                output = output[-1]
-            #loss = focal_loss(output, target)
+            
             loss = crossentropy_loss(output, target,weight=class_weight)
 
             correct, total, acc = accuracy(output, target)
-            num_samples = batch_idx * args.batch_size + 1
+            #num_samples = batch_idx * args.batch_size + 1
             _, preds = torch.max(output, 1)
             bacc = balanced_accuracy_score(target.cpu().detach().numpy(),preds.cpu().detach().numpy())
             for t, p in zip(target.cpu().view(-1), preds.cpu().view(-1)):
@@ -189,7 +184,7 @@ def validation(args, model, testloader, epoch, class_weight):
             metrics.update({'correct': correct, 'total': total, 'loss': loss.item(), 'accuracy': acc, 'bacc':bacc})
             #print_stats(args, epoch, num_samples, testloader, metrics)
 
-    print_summary(args, epoch, num_samples, metrics, mode="Validation")
+    print_summary(args, epoch, batch_idx, metrics, mode="Validation")
     return metrics,confusion_matrix
 
 def validation_bayesian(args, model, testloader, epoch, class_weight):
@@ -234,7 +229,7 @@ def initialize_from_saved_model(args):
     print('Training on saved model')
     if args.device is not None:
         os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
-    model, optimizer, epoch = load_model(args)
+    model, optimizer, epoch, bflag = load_model(args)
        
     train_loader = COVIDxDataset(mode='train', n_classes=args.classes, dataset_path=args.dataset,
                                  dim=(224, 224))
@@ -242,7 +237,7 @@ def initialize_from_saved_model(args):
     #------ Class weigths for sampling and for loss function -----------------------------------
     labels = np.unique(train_loader.labels)
     #print(labels)
-    class_weight = compute_class_weight('balanced', labels, train_loader.labels)
+    class_weight = compute_class_weight(class_weight='balanced', classes=labels, y=train_loader.labels)
     class_weight = class_weight[::-1]
     #class_weight[2]=50
     #weights = torch.DoubleTensor(class_weight.copy())
@@ -265,4 +260,4 @@ def initialize_from_saved_model(args):
     #------------------------------------------------------------------------------------------
     training_generator = DataLoader(train_loader, **train_params)
     val_generator = DataLoader(val_loader, **test_params)
-    return model, optimizer,training_generator,val_generator, class_weight, epoch
+    return model, optimizer,training_generator,val_generator, class_weight, epoch, bflag

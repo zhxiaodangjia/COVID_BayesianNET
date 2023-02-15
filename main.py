@@ -17,7 +17,7 @@ def main():
     if (args.cuda):
         torch.cuda.manual_seed(SEED)
     if args.new_training:
-        model, optimizer, training_generator, val_generator, class_weight, Last_epoch = initialize_from_saved_model(args)
+        model, optimizer, training_generator, val_generator, class_weight, Last_epoch, bflag = initialize_from_saved_model(args)
     else:
         model, optimizer, training_generator, val_generator, class_weight, bflag = initialize(args)
         Last_epoch = 0
@@ -48,6 +48,7 @@ def BalancedAccuray(CM):
     BACC = np.zeros(Nc)
     for i in range(Nc):
         BACC[i] = CM[i,i]/np.sum(CM[i,:])
+    print(np.mean(BACC))
     return np.mean(BACC)
 
 
@@ -72,12 +73,12 @@ def get_arguments():
     parser.add_argument('--cuda', action='store_true', default=True)
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: none)')
-    parser.add_argument('--model', type=str, default='',
+    parser.add_argument('--model', type=str, default='DenseNet',
                         choices=('DenseNet','BDenseNet','EfficientNet','BEfficientNet'))
     parser.add_argument('--init_from', action='store_true', default=False)
     parser.add_argument('--opt', type=str, default='adam',
                         choices=('sgd', 'adam', 'rmsprop'))
-    parser.add_argument('--dataset', type=str, default='data/',
+    parser.add_argument('--dataset', type=str, default='COVID_BayesianNET/Data/OrgImagesRescaled',
                         help='path to dataset ')
     parser.add_argument('--saved_model', type=str, default='COVID_BayesianNET/models_saved/Model_best_checkpoint.pth.tar',
                         help='path to save_model ')

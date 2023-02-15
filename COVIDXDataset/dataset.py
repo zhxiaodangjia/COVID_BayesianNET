@@ -1,10 +1,10 @@
 import os
 import torch
 from torch.utils.data import Dataset
-import glob
+#import glob
 import numpy as np
 import random as ra
-from utils import read_filepaths
+from utils.util import read_filepaths
 from PIL import Image, ImageOps
 import cv2
 from matplotlib import cm
