@@ -14,6 +14,9 @@ def main():
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     np.random.seed(SEED)
+
+    args.save = args.save + args.model + '_' + util.datestr()
+
     if (args.cuda):
         torch.cuda.manual_seed(SEED)
     if args.new_training:
@@ -80,9 +83,11 @@ def get_arguments():
                         choices=('sgd', 'adam', 'rmsprop'))
     parser.add_argument('--dataset', type=str, default='COVID_BayesianNET/Data/OrgImagesRescaled/',
                         help='path to dataset ')
+    parser.add_argument('--pre_processing', type=str, default='None',
+                        choices=('None','Equalization','CLAHE'))
     parser.add_argument('--saved_model', type=str, default='COVID_BayesianNET/models_saved/Model_best_checkpoint.pth.tar',
                         help='path to save_model ')
-    parser.add_argument('--save', type=str, default='COVID_BayesianNET/models_saved/Model_' + util.datestr(),
+    parser.add_argument('--save', type=str, default='COVID_BayesianNET/models_saved/',
                         help='path to checkpoint ')
     args = parser.parse_args()
     return args

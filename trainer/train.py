@@ -4,7 +4,7 @@ import torch.nn as nn
 import numpy as np
 from sklearn.utils.class_weight import compute_class_weight, compute_sample_weight
 from model.loss import crossentropy_loss
-from utils.util import Metrics, print_stats, print_summary, select_model, select_optimizer, load_model
+from utils.util import Metrics, print_stats, print_summary, select_model, select_optimizer, load_model, assign_free_gpus
 from model.metric import accuracy
 from COVIDXDataset.dataset import COVIDxDataset
 from torch.utils.data import DataLoader
@@ -14,7 +14,7 @@ from bayesian_torch.models.dnn_to_bnn import get_kl_loss
 
 def initialize(args):
     if args.device is not None:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
+        assign_free_gpus()
     model, bflag = select_model(args)
     
     optimizer = select_optimizer(args,model)
@@ -22,7 +22,7 @@ def initialize(args):
         model.cuda()
    
     train_loader = COVIDxDataset(mode='train', n_classes=args.classes, dataset_path=args.dataset,
-                                 dim=(224, 224))
+                                 dim=(224, 224), pre_processing = args.pre_processing)
     #print(train_loader.)
     #------ Class weigths for sampling and for loss function -----------------------------------
     labels = np.unique(train_loader.labels)
@@ -42,7 +42,7 @@ def initialize(args):
     #print(class_weight.shape)
     #-------------------------------------------
     val_loader = COVIDxDataset(mode='test', n_classes=args.classes, dataset_path=args.dataset,
-                               dim=(224, 224))
+                               dim=(224, 224), pre_processing = args.pre_processing)
     #------------------------------------------------------------------------------------
     train_params = {'batch_size': args.batch_size,
                     'shuffle': True,
@@ -228,11 +228,11 @@ def validation_bayesian(args, model, testloader, epoch, class_weight):
 def initialize_from_saved_model(args):
     print('Training on saved model')
     if args.device is not None:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
+        assign_free_gpus()
     model, optimizer, epoch, bflag = load_model(args)
        
     train_loader = COVIDxDataset(mode='train', n_classes=args.classes, dataset_path=args.dataset,
-                                 dim=(224, 224))
+                                 dim=(224, 224), pre_processing = args.pre_processing)
     #print(train_loader.)
     #------ Class weigths for sampling and for loss function -----------------------------------
     labels = np.unique(train_loader.labels)
@@ -249,7 +249,7 @@ def initialize_from_saved_model(args):
     #print(class_weight.shape)
     #-------------------------------------------
     val_loader = COVIDxDataset(mode='test', n_classes=args.classes, dataset_path=args.dataset,
-                            dim=(224, 224))
+                            dim=(224, 224), pre_processing = args.pre_processing)
     #------------------------------------------------------------------------------------
     train_params = {'batch_size': args.batch_size,
                     'shuffle': True,
