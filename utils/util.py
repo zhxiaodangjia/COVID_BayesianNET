@@ -202,6 +202,23 @@ def print_summary(args, epoch, num_samples, metrics, mode=''):
                                                                                                      metrics.data[
                                                                                                          'bacc']/num_samples))
 
+def ImportantOfContext(ReMap: np.array, Mask: np.array) -> float:
+    (rr,cr) = ReMap.shape
+    (rm,cm) = Mask.shape
+    assert rr == rm, 'Relevance Map and Mask mismatch in the number of rows'
+    assert cr == cm, 'Relevance Map and Mask mismatch in the number of columns'
+    
+    Mask[Mask>0] = 1
+    ReMap[ReMap<0]=0 #Take only pixels with positive relevance to estimate IoC
+    
+    Pin = ReMap * Mask
+    npin = np.sum(Pin > 0)
+    
+    Pout = ReMap * (1 - Mask)
+    npout = np.sum(Pout > 0)
+    
+    IoC = (np.sum(Pout)/npout)/(np.sum(Pin)/npin)
+    return IoC
 
 def confusion_matrix(nb_classes):
 

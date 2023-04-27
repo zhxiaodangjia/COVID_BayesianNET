@@ -131,5 +131,8 @@ dmypy.json
 #Others
 .DS_Store
 /Pytorch_LRP
-/models_saved
-/Data
+/model_saved
+/data
+/data_paper
+/Test_notebooks
+/segmenter
