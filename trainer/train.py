@@ -23,7 +23,7 @@ def initialize(args):
         labels_db = np.unique(train_loader.dbs)
         db_weight = compute_class_weight(class_weight='balanced', classes=labels_db, y=train_loader.dbs)
         n_dbs = len(labels_db)
-
+        print(f'Numer of different databases = {n_dbs}')
         if args.resume:
             model, optimizer, epoch, bflag = load_model(args,n_dbs)
         else:

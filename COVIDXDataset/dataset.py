@@ -13,7 +13,7 @@ from batchgenerators.transforms import spatial_transforms
 from skimage.util import random_noise
 
 COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
-DatasetDIC = {'ACT': 0, 'BIMCV': 1, 'CHEXPERT': 2, 'CRXNIH': 3, 'HM1': 4, 'HM2': 5, 'MIMIC': 6, 'NIH': 7}
+DatasetDIC = {'ACT': 0, 'BIMCV': 1, 'CHEXPERT': 2, 'CHS':3, 'CRXNIH': 4, 'HM1': 5, 'HM2': 6, 'MIMIC': 7, 'MOS': 8, 'NIH': 9}
 def do_augmentation(image_tensor):
     array, _ = spatial_transforms.augment_mirroring(image_tensor, axes=(1, 2))
     augmented = array[None, ...]
@@ -136,7 +136,6 @@ class COVIDxDataset_DA(Dataset):
         image_tensor = self.load_image(self.root + self.paths[index])
         label_tensor = self.COVIDxDICT[self.labels[index]]
         image_tensor = image_tensor.numpy()
-        print(self.paths[index])
         label_db = DatasetDIC[self.paths[index].split("_")[0]]
         labels = torch.tensor([label_tensor,label_db],dtype=torch.long)
         if ra.random()>0.5:
