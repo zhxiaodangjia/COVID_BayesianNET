@@ -2,7 +2,7 @@ import argparse
 import torch
 import numpy as np
 import utils.util as util
-from trainer.train import initialize, train, train_bayesian, validation, validation_bayesian, initialize_from_saved_model
+from trainer.train import initialize, train, train_bayesian, validation, validation_bayesian
 #from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
@@ -19,13 +19,8 @@ def main():
 
     if (args.cuda):
         torch.cuda.manual_seed(SEED)
-    if args.new_training:
-        model, optimizer, training_generator, val_generator, class_weight, Last_epoch, bflag = initialize_from_saved_model(args)
-    else:
-        model, optimizer, training_generator, val_generator, class_weight, bflag = initialize(args)
-        Last_epoch = 0
 
-    #print(model)
+    model, optimizer, training_generator, val_generator, class_weight, Last_epoch, bflag = initialize(args)
 
     best_pred_loss = 0#lo cambie por balanced accuracy
     scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=3, min_lr=1e-5, verbose=True)
@@ -58,7 +53,7 @@ def BalancedAccuray(CM):
 
 def get_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--new_training', action='store_true', default=False,
+    parser.add_argument('--resume', action='store_true', default=False,
                         help='load saved_model as initial model')
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--log_interval', type=int, default=1000)
@@ -74,11 +69,11 @@ def get_arguments():
     parser.add_argument('--weight_decay', default=1e-7, type=float,
                         help='weight decay (default: 1e-6)')
     parser.add_argument('--cuda', action='store_true', default=True)
-    parser.add_argument('--resume', default='', type=str, metavar='PATH',
-                        help='path to latest checkpoint (default: none)')
     parser.add_argument('--model', type=str, default='DenseNet',
                         choices=('DenseNet','BDenseNet','EfficientNet','BEfficientNet'))
-    parser.add_argument('--init_from', action='store_true', default=False)
+    parser.add_argument('--mode', type=str, default='None',
+                        choices=('None','DA'),help='Domain adversarial with respect to the data bases')
+    parser.add_argument('--init_from', action='store_true', default=False, help='In case of Bayessian models, start from a pretrained non Bayesian model')
     parser.add_argument('--opt', type=str, default='adam',
                         choices=('sgd', 'adam', 'rmsprop'))
     parser.add_argument('--dataset', type=str, default='COVID_BayesianNET/Data/OrgImagesRescaled/',

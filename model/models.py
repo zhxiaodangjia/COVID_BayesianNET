@@ -1,5 +1,7 @@
 import torch
+from torch.autograd import Function
 import torchvision
+import torch.nn.functional as F
 from bayesian_torch.models.dnn_to_bnn import dnn_to_bnn
 
 const_bnn_prior_parameters = {
@@ -11,6 +13,12 @@ const_bnn_prior_parameters = {
         "moped_enable": True,  # True to initialize mu/sigma from the pretrained dnn weights
         "moped_delta": 0.5,
 }
+
+def get_output_shape(model, image_dim):
+    feature = model(torch.rand(*image_dim))
+    feature = F.adaptive_avg_pool2d(feature, (1, 1))
+    feature = torch.flatten(feature,1)
+    return feature.data.shape[-1]
 
 def BDenseNet(n_classes=3, saved_model = ''):
 
@@ -55,3 +63,43 @@ def EfficientNet(n_classes=3):
         ) 
 
     return model
+
+class ReverseLayerF(Function):
+
+    @staticmethod
+    def forward(ctx, x, alpha):
+        ctx.alpha = alpha
+
+        return x.view_as(x)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        output = grad_output.neg() * ctx.alpha
+
+        return output, None
+
+class Model_DA(torch.nn.Module):
+    def __init__(self, model, n_databases):
+        super(Model_DA, self).__init__()
+        self.model_base = model
+        self.domain_classifier = torch.nn.Sequential()
+        dim_features = get_output_shape(self.model_base.features,(1, 3, 224, 224))
+        print(f'Dim = {dim_features}')
+        self.domain_classifier.add_module('dc_l1',torch.nn.Linear(dim_features, 256))
+        self.domain_classifier.add_module('dc_l2',torch.nn.Linear(256, n_databases))
+
+    def forward(self, x):
+        if self.training:
+            class_output = self.model_base(x)
+            feature = self.model_base.features(x)
+            feature = F.relu(feature, inplace=True)
+            feature = F.adaptive_avg_pool2d(feature, (1, 1))
+            feature = torch.flatten(feature,1)
+            reverse_feature = ReverseLayerF.apply(feature, 1)
+            domain_output = self.domain_classifier(reverse_feature)
+            return class_output, domain_output
+        else:
+            class_output = self.model_base(x)
+            return class_output
+
+    

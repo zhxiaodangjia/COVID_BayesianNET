@@ -7,7 +7,7 @@ from collections import OrderedDict
 import json
 import torch.optim as optim
 import pandas as pd
-from model.models import BDenseNet, DenseNet, BEfficientNet, EfficientNet
+from model.models import BDenseNet, DenseNet, BEfficientNet, EfficientNet, Model_DA
 import csv
 import numpy as np
 
@@ -46,22 +46,15 @@ def showgradients(model):
         print(type(param.data), param.size())
         print("GRADS= \n", param.grad)
 
-
-
-
-
 def datestr():
     now = time.gmtime()
     return '{}{:02}{:02}_{:02}{:02}'.format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min)
-
 
 def save_checkpoint(state, is_best, path,  filename='last'):
 
     name = os.path.join(path, filename+'_checkpoint.pth.tar')
     print(name)
     torch.save(state, name)
-
-
 
 def save_model(model,optimizer, args, metrics, epoch, best_pred_loss,confusion_matrix):
     loss = metrics.data['bacc']
@@ -93,78 +86,73 @@ def save_model(model,optimizer, args, metrics, epoch, best_pred_loss,confusion_m
 
     return best_pred_loss
 
-def load_model(args):
+def load_model(args,n_dbs=1):
     checkpoint = torch.load(args.saved_model)
-    model,bflag = select_model(args)
+    model,bflag = select_model(args,n_dbs)
     model.load_state_dict(checkpoint['state_dict'])
-
-    if (args.cuda):
-        model.cuda()
-
     optimizer = select_optimizer(args,model)
     optimizer.load_state_dict(checkpoint['optimizer'])
     epoch = checkpoint['epoch']
     return model, optimizer, epoch, bflag
-
 
 def make_dirs(path):
     if not os.path.exists(path):
 
         os.makedirs(path)
 
-
 def create_stats_files(path):
     train_f = open(os.path.join(path, 'train.csv'), 'w')
     val_f = open(os.path.join(path, 'val.csv'), 'w')
     return train_f, val_f
 
-
 def read_json_file(fname):
     with open(fname, 'r') as handle:
         return json.load(handle, object_hook=OrderedDict)
-
 
 def write_json_file(content, fname):
     with open(fname, 'w') as handle:
         json.dump(content, handle, indent=4, sort_keys=False)
 
-
 def read_filepaths(file):
-    paths, labels = [], []
+    paths, labels, dbs = [], [], []
     with open(file, 'r') as f:
         lines = f.read().splitlines()
 
-        for idx, line in enumerate(lines):
+        for line in lines:
             if ('/ c o' in line):
                 break
             #print(line)    
-            subjid, path, label = line.split(' ')
-
+            _, path, label = line.split(' ')
+            db = path.split('_')[0]
             paths.append(path)
             labels.append(label)
+            dbs.append(db)
     labes_array = np.array(labels)
     classes = np.unique(labes_array)
     for i in classes:
         print('Clase={}-Samples={}'.format(i, np.sum(labes_array == i)))
-    return paths, labels
+    return paths, labels, dbs
 
-def select_model(args):
+def select_model(args,n_dbs=1):
     if args.model == 'BDenseNet':
         if args.init_from:
-            return BDenseNet(n_classes = args.classes, saved_model = args.saved_model), True
+            model = BDenseNet(n_classes = args.classes, saved_model = args.saved_model), True
         else:
-            return BDenseNet(args.classes), True #Flag: True: Bayesian model, False: Frequentist model
+            model = BDenseNet(args.classes), True #Flag: True: Bayesian model, False: Frequentist model
     elif args.model == 'DenseNet':
-        return DenseNet(n_classes = args.classes), False
+        model = DenseNet(n_classes = args.classes), False
     elif args.model == 'EfficientNet':
-        return EfficientNet(n_classes = args.classes), False
+        model = EfficientNet(n_classes = args.classes), False
     elif args.model == 'BEfficientNet':
         if args.init_from:
-            return BEfficientNet(n_classes = args.classes, saved_model = args.saved_model), True
+            model = BEfficientNet(n_classes = args.classes, saved_model = args.saved_model), True
         else:
-            return BEfficientNet(n_classes = args.classes), True
+            model = BEfficientNet(n_classes = args.classes), True
 
-
+    if args.mode == 'DA':
+        return Model_DA(model,n_dbs)
+    else:
+        return model
 
 def select_optimizer(args, model):
     if args.opt == 'sgd':
@@ -173,7 +161,6 @@ def select_optimizer(args, model):
         return optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     elif args.opt == 'rmsprop':
         return optim.RMSprop(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-
 
 def print_stats(args, epoch, num_samples, trainloader, metrics):
     if (num_samples % args.log_interval == 1):
@@ -187,8 +174,7 @@ def print_stats(args, epoch, num_samples, trainloader, metrics):
                                                                                              'correct'] /
                                                                                          metrics.data[
                                                                                              'total']))
-
-
+        
 def print_summary(args, epoch, num_samples, metrics, mode=''):
     print(mode + "\n SUMMARY EPOCH:{:2d}\tSample:{:5d}/{:5d}\tLoss:{:.4f}\tAccuracy:{:.2f}\tBalancedAccuracy:{:.2f}\n".format(epoch,
                                                                                                      num_samples,
@@ -221,8 +207,6 @@ def ImportantOfContext(ReMap: np.array, Mask: np.array) -> float:
     return IoC
 
 def confusion_matrix(nb_classes):
-
-
 
     confusion_matrix = torch.zeros(nb_classes, nb_classes)
     with torch.no_grad():
