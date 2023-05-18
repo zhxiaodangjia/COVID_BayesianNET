@@ -220,6 +220,14 @@ def confusion_matrix(nb_classes):
 
     print(confusion_matrix)
 
+def BalancedAccuray(CM):
+    Nc = CM.shape[0]
+    BACC = np.zeros(Nc)
+    for i in range(Nc):
+        BACC[i] = CM[i,i]/np.sum(CM[i,:])
+    print(np.mean(BACC))
+    return np.mean(BACC)
+
 class Metrics:
     def __init__(self, path, keys=None, writer=None):
         self.writer = writer

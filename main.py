@@ -22,7 +22,7 @@ def main():
 
     model, optimizer, training_generator, val_generator, class_weight, Last_epoch, bflag = initialize(args)
 
-    best_pred_loss = 0#lo cambie por balanced accuracy
+    best_pred_loss = 0#the metric is balance accuracy
     scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=3, min_lr=1e-5, verbose=True)
     print('Checkpoint folder ', args.save)
     # writer = SummaryWriter(log_dir='../runs/' + args.model, comment=args.model)
@@ -34,22 +34,12 @@ def main():
             train(args, model, training_generator, optimizer, Last_epoch+epoch, class_weight)
             val_metrics, confusion_matrix = validation(args, model, val_generator, Last_epoch+epoch, class_weight)
        
-        BACC = BalancedAccuray(confusion_matrix.numpy())
+        BACC = util.BalancedAccuray(confusion_matrix.numpy())
         val_metrics.replace({'bacc': BACC})
         best_pred_loss = util.save_model(model, optimizer, args, val_metrics, Last_epoch+epoch, best_pred_loss, confusion_matrix)
 
         print(confusion_matrix)
         scheduler.step(val_metrics.avg_loss())
-
-def BalancedAccuray(CM):
-    Nc = CM.shape[0]
-    BACC = np.zeros(Nc)
-    for i in range(Nc):
-        BACC[i] = CM[i,i]/np.sum(CM[i,:])
-    print(np.mean(BACC))
-    return np.mean(BACC)
-
-
 
 def get_arguments():
     parser = argparse.ArgumentParser()
