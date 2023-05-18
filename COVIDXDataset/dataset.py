@@ -134,9 +134,11 @@ class COVIDxDataset_DA(Dataset):
 
     def __getitem__(self, index):
         image_tensor = self.load_image(self.root + self.paths[index])
-        label_tensor = torch.tensor(self.COVIDxDICT[self.labels[index]], dtype=torch.long)
+        label_tensor = self.COVIDxDICT[self.labels[index]]
         image_tensor = image_tensor.numpy()
-        label_db = torch.tensor(DatasetDIC[self.paths[index].split("_")[0]])
+        label_db = DatasetDIC[self.paths[index].split("_")[0]]
+        labels = torch.tensor([label_tensor,label_db],dtype=torch.long)
+        print(labels)
         if ra.random()>0.5:
             image_tensor = random_noise(image_tensor, mode='gaussian', mean=0.015, var = 0.015)
             
@@ -147,7 +149,7 @@ class COVIDxDataset_DA(Dataset):
             final_tensor = augmented_tensor
         else:
             final_tensor = torch.FloatTensor(image_tensor)
-        return final_tensor, torch.cat((label_tensor,label_db),1)
+        return final_tensor, labels
 
     def load_image(self, img_path):
         if not os.path.exists(img_path):
