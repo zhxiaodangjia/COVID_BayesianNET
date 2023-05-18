@@ -81,17 +81,17 @@ class ReverseLayerF(Function):
 class Model_DA(torch.nn.Module):
     def __init__(self, model, n_databases):
         super(Model_DA, self).__init__()
-        self.model_base = model
+        self.base_model = model
         self.domain_classifier = torch.nn.Sequential()
-        dim_features = get_output_shape(self.model_base.features,(1, 3, 224, 224))
+        dim_features = get_output_shape(self.base_model.features,(1, 3, 224, 224))
         print(f'Dim = {dim_features}')
         self.domain_classifier.add_module('dc_l1',torch.nn.Linear(dim_features, 256))
         self.domain_classifier.add_module('dc_l2',torch.nn.Linear(256, n_databases))
 
     def forward(self, x):
         if self.training:
-            class_output = self.model_base(x)
-            feature = self.model_base.features(x)
+            class_output = self.base_model(x)
+            feature = self.base_model.features(x)
             feature = F.relu(feature, inplace=True)
             feature = F.adaptive_avg_pool2d(feature, (1, 1))
             feature = torch.flatten(feature,1)
@@ -99,7 +99,7 @@ class Model_DA(torch.nn.Module):
             domain_output = self.domain_classifier(reverse_feature)
             return class_output, domain_output
         else:
-            class_output = self.model_base(x)
+            class_output = self.base_model(x)
             return class_output
 
     
