@@ -98,25 +98,24 @@ def train(args, model, trainloader, optimizer, epoch, weights):
     if args.mode == 'DA':
         for batch_idx, input_tensors in enumerate(trainloader):
             optimizer.zero_grad()
-            input_data, target, db = input_tensors
+            input_data, target = input_tensors
             if (args.cuda):
                 input_data = input_data.cuda()
-                target = target.cuda()
-                db = db.cuda()
+                target = target.cuda() 
 
             output_class, output_db = model(input_data)
      
-            loss_class = crossentropy_loss(output_class, target, weight=weights[0])
-            loss_db = crossentropy_loss(output_db, db, weight=weights[1])
+            loss_class = crossentropy_loss(output_class, target[:,0], weight=weights[0])
+            loss_db = crossentropy_loss(output_db,  target[:,1], weight=weights[1])
             loss = loss_class + loss_db
             loss.backward()
             optimizer.step()
-            correct, total, acc = accuracy(output_class, target)
+            correct, total, acc = accuracy(output_class, target[:,0])
 
             num_samples = batch_idx * args.batch_size + 1
             _, predicted_class = output_class.max(1)
 
-            bacc = balanced_accuracy_score(target.cpu().detach().numpy(),predicted_class.cpu().detach().numpy())
+            bacc = balanced_accuracy_score(target[:,0].cpu().detach().numpy(),predicted_class.cpu().detach().numpy())
             metrics.update({'correct': correct, 'total': total, 'loss': loss.item(), 'accuracy': acc, 'bacc':bacc})
             print_stats(args, epoch, num_samples, trainloader, metrics)
     else:
@@ -152,16 +151,15 @@ def train_bayesian(args, model, trainloader, optimizer, epoch, weights):
         for batch_idx, input_tensors in enumerate(trainloader):
             model.train()
             optimizer.zero_grad()
-            input_data, target, db = input_tensors
+            input_data, target = input_tensors
             if (args.cuda):
                 input_data = input_data.cuda()
                 target = target.cuda()
-                db = db.cuda()
   
             output_class, output_db = model(input_data)
             kl = get_kl_loss(model)
-            ce_loss = crossentropy_loss(output_class, target, weight=weights[0])
-            loss_db = crossentropy_loss(output_db, db, weight=weights[1])
+            ce_loss = crossentropy_loss(output_class, target[:,0], weight=weights[0])
+            loss_db = crossentropy_loss(output_db, target[:,1], weight=weights[1])
             loss = loss_db + ce_loss + kl / args.batch_size 
             
             loss.backward()
@@ -177,12 +175,12 @@ def train_bayesian(args, model, trainloader, optimizer, epoch, weights):
                 output = torch.stack(output_mc)  
                 pred_mean = output.mean(dim=0)
 
-            correct, total, acc = accuracy(pred_mean, target)
+            correct, total, acc = accuracy(pred_mean, target[:,0])
 
             num_samples = batch_idx * args.batch_size + 1
             _, predicted_class = pred_mean.max(1)
 
-            bacc = balanced_accuracy_score(target.cpu().detach().numpy(),predicted_class.cpu().detach().numpy())
+            bacc = balanced_accuracy_score(target[:,0].cpu().detach().numpy(),predicted_class.cpu().detach().numpy())
             metrics.update({'correct': correct, 'total': total, 'loss': loss.item(), 'accuracy': acc, 'bacc':bacc})
             print_stats(args, epoch, num_samples, trainloader, metrics)
     else:
