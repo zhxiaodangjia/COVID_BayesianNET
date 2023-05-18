@@ -136,6 +136,7 @@ class COVIDxDataset_DA(Dataset):
         image_tensor = self.load_image(self.root + self.paths[index])
         label_tensor = self.COVIDxDICT[self.labels[index]]
         image_tensor = image_tensor.numpy()
+        print(self.paths[index])
         label_db = DatasetDIC[self.paths[index].split("_")[0]]
         labels = torch.tensor([label_tensor,label_db],dtype=torch.long)
         if ra.random()>0.5:
