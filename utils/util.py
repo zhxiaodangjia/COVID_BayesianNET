@@ -136,23 +136,23 @@ def read_filepaths(file):
 def select_model(args,n_dbs=1):
     if args.model == 'BDenseNet':
         if args.init_from:
-            model = BDenseNet(n_classes = args.classes, saved_model = args.saved_model), True
+            model, bflag = BDenseNet(n_classes = args.classes, saved_model = args.saved_model), True
         else:
-            model = BDenseNet(args.classes), True #Flag: True: Bayesian model, False: Frequentist model
+            model, bflag = BDenseNet(args.classes), True #Flag: True: Bayesian model, False: Frequentist model
     elif args.model == 'DenseNet':
-        model = DenseNet(n_classes = args.classes), False
+        model, bflag = DenseNet(n_classes = args.classes), False
     elif args.model == 'EfficientNet':
-        model = EfficientNet(n_classes = args.classes), False
+        model, bflag = EfficientNet(n_classes = args.classes), False
     elif args.model == 'BEfficientNet':
         if args.init_from:
-            model = BEfficientNet(n_classes = args.classes, saved_model = args.saved_model), True
+            model, bflag = BEfficientNet(n_classes = args.classes, saved_model = args.saved_model), True
         else:
-            model = BEfficientNet(n_classes = args.classes), True
+            model, bflag = BEfficientNet(n_classes = args.classes), True
 
     if args.mode == 'DA':
-        return Model_DA(model,n_dbs)
+        return Model_DA(model,n_dbs), bflag
     else:
-        return model
+        return model, bflag
 
 def select_optimizer(args, model):
     if args.opt == 'sgd':

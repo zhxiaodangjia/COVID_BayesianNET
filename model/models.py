@@ -81,7 +81,6 @@ class ReverseLayerF(Function):
 class Model_DA(torch.nn.Module):
     def __init__(self, model, n_databases):
         super(Model_DA, self).__init__()
-        print(model.features)
         self.base_model = model
         self.domain_classifier = torch.nn.Sequential()
         dim_features = get_output_shape(self.base_model.features,(1, 3, 224, 224))
