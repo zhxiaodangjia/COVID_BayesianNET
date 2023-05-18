@@ -138,11 +138,10 @@ class COVIDxDataset_DA(Dataset):
         image_tensor = image_tensor.numpy()
         label_db = DatasetDIC[self.paths[index].split("_")[0]]
         labels = torch.tensor([label_tensor,label_db],dtype=torch.long)
-        print(labels)
         if ra.random()>0.5:
             image_tensor = random_noise(image_tensor, mode='gaussian', mean=0.015, var = 0.015)
             
-        if ((label_tensor.numpy() == 2 and ra.random()>0.17) or (label_tensor.numpy() ==0 and ra.random()>0.5)) and self.mode == 'train':#apply data augmentation only for COVID:if label_tensor.numpy() == 2  and self.mode == 'train'
+        if ((label_tensor == 2 and ra.random()>0.17) or (label_tensor ==0 and ra.random()>0.5)) and self.mode == 'train':#apply data augmentation only for COVID:if label_tensor.numpy() == 2  and self.mode == 'train'
             augmented_tensor = do_augmentation(image_tensor)
             augmented_tensor = torch.from_numpy(augmented_tensor)
             augmented_tensor = torch.squeeze(augmented_tensor, dim=0)
