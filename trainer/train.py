@@ -226,6 +226,10 @@ def validation(args, model, testloader, epoch, weights):
     metrics = Metrics('')
     metrics.reset()
     confusion_matrix = torch.zeros(args.classes, args.classes)
+    if args.mode == 'DA':
+        class_weights = weights[0]
+    else:
+        class_weights = weights
     with torch.no_grad():
         for batch_idx, input_tensors in enumerate(testloader):
 
@@ -236,7 +240,7 @@ def validation(args, model, testloader, epoch, weights):
             #print(input_data.shape)
             output = model(input_data)
             
-            loss = crossentropy_loss(output, target,weight=weights[0])
+            loss = crossentropy_loss(output, target,weight=class_weights)
 
             correct, total, acc = accuracy(output, target)
             #num_samples = batch_idx * args.batch_size + 1
@@ -252,10 +256,13 @@ def validation(args, model, testloader, epoch, weights):
 
 def validation_bayesian(args, model, testloader, epoch, weights):
     model.eval()
-
     metrics = Metrics('')
     metrics.reset()
     confusion_matrix = torch.zeros(args.classes, args.classes)
+    if args.mode == 'DA':
+        class_weights = weights[0]
+    else:
+        class_weights = weights
     with torch.no_grad():
         for batch_idx, input_tensors in enumerate(testloader):
 
@@ -265,7 +272,7 @@ def validation_bayesian(args, model, testloader, epoch, weights):
                 target = target.cuda()
             #print(input_data.shape)
             output = model(input_data)
-            loss = crossentropy_loss(output, target,weight=weights[0])
+            loss = crossentropy_loss(output, target,weight=class_weights)
 
             with torch.no_grad():
                 output_mc = []
