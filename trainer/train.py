@@ -221,7 +221,7 @@ def train_bayesian(args, model, trainloader, optimizer, epoch, weights):
     print_summary(args, epoch, num_samples, metrics, mode="Training")
     return metrics
 
-def validation(args, model, testloader, epoch, class_weight):
+def validation(args, model, testloader, epoch, weights):
     model.eval()
     metrics = Metrics('')
     metrics.reset()
@@ -236,7 +236,7 @@ def validation(args, model, testloader, epoch, class_weight):
             #print(input_data.shape)
             output = model(input_data)
             
-            loss = crossentropy_loss(output, target,weight=class_weight)
+            loss = crossentropy_loss(output, target,weight=weights[0])
 
             correct, total, acc = accuracy(output, target)
             #num_samples = batch_idx * args.batch_size + 1

@@ -20,7 +20,7 @@ def main():
     if (args.cuda):
         torch.cuda.manual_seed(SEED)
 
-    model, optimizer, training_generator, val_generator, class_weight, Last_epoch, bflag = initialize(args)
+    model, optimizer, training_generator, val_generator, weights, Last_epoch, bflag = initialize(args)
 
     best_pred_loss = 0#the metric is balance accuracy
     scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=3, min_lr=1e-5, verbose=True)
@@ -28,11 +28,11 @@ def main():
     # writer = SummaryWriter(log_dir='../runs/' + args.model, comment=args.model)
     for epoch in range(1, args.nEpochs + 1):
         if bflag:
-            train_bayesian(args, model, training_generator, optimizer, Last_epoch+epoch, class_weight)
-            val_metrics, confusion_matrix = validation_bayesian(args, model, val_generator, Last_epoch+epoch, class_weight)
+            train_bayesian(args, model, training_generator, optimizer, Last_epoch+epoch, weights)
+            val_metrics, confusion_matrix = validation_bayesian(args, model, val_generator, Last_epoch+epoch, weights)
         else:
-            train(args, model, training_generator, optimizer, Last_epoch+epoch, class_weight)
-            val_metrics, confusion_matrix = validation(args, model, val_generator, Last_epoch+epoch, class_weight)
+            train(args, model, training_generator, optimizer, Last_epoch+epoch, weights)
+            val_metrics, confusion_matrix = validation(args, model, val_generator, Last_epoch+epoch, weights)
        
         BACC = util.BalancedAccuray(confusion_matrix.numpy())
         val_metrics.replace({'bacc': BACC})
