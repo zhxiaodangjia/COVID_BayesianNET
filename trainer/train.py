@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from sklearn.metrics import balanced_accuracy_score
 from bayesian_torch.models.dnn_to_bnn import get_kl_loss
 
-
+##所有的db都是指的数据集来源，也就是数据集的标签
 def initialize(args):
     if args.device is not None:
             assign_free_gpus()
@@ -20,11 +20,12 @@ def initialize(args):
 
         train_loader = COVIDxDataset_DA(mode='train', n_classes=args.classes, dataset_path=args.dataset,
                                  dim=(224, 224), pre_processing = args.pre_processing)        
-        labels_db = np.unique(train_loader.dbs)
+        labels_db = np.unique(train_loader.dbs) #数据集来源的标签
         db_weight = compute_class_weight(class_weight='balanced', classes=labels_db, y=train_loader.dbs)
-        n_dbs = len(labels_db)
+        #计算数据集来源的权重
+        n_dbs = len(labels_db) #number of different databases
         print(f'Numer of different databases = {n_dbs}')
-        if args.resume:
+        if args.resume: #如果是继续训练
             model, optimizer, epoch, bflag = load_model(args,n_dbs)
         else:
             model, bflag = select_model(args,n_dbs)
@@ -103,10 +104,10 @@ def train(args, model, trainloader, optimizer, epoch, weights):
                 input_data = input_data.cuda()
                 target = target.cuda() 
 
-            output_class, output_db = model(input_data)
+            output_class, output_db = model(input_data) #output_db是数据集来源的预测
      
-            loss_class = crossentropy_loss(output_class, target[:,0], weight=weights[0])
-            loss_db = crossentropy_loss(output_db,  target[:,1], weight=weights[1])
+            loss_class = crossentropy_loss(output_class, target[:,0], weight=weights[0]) #target的shape是(batch_size,2),第一个是类别，第二个是数据集来源
+            loss_db = crossentropy_loss(output_db,  target[:,1], weight=weights[1])#target的shape是(batch_size,2)
             loss = loss_class + loss_db
             loss.backward()
             optimizer.step()

@@ -14,11 +14,11 @@ const_bnn_prior_parameters = {
         "moped_delta": 0.5,
 }
 
-def get_output_shape(model, image_dim):
-    feature = model(torch.rand(*image_dim))
-    feature = F.adaptive_avg_pool2d(feature, (1, 1))
-    feature = torch.flatten(feature,1)
-    return feature.data.shape[-1]
+def get_output_shape(model, image_dim): #确定模型输出的特征尺寸
+    feature = model(torch.rand(*image_dim)) # 随机生成一个输入传到模型中，shape = (batch_size, channels, height, width)
+    feature = F.adaptive_avg_pool2d(feature, (1, 1)) #自适应平均池化，（1，1）的意思是输出的特征图大小为1*1，所以输出的shape为 (batch_size, num_channels, 1, 1)
+    feature = torch.flatten(feature,1) #将特征图展平，shape为(batch_size, num_channels)
+    return feature.data.shape[-1] #返回特征的最后一个维度，即特征的长度（num_channels）
 
 def BDenseNet(n_classes=3, saved_model = ''):
 
@@ -65,16 +65,16 @@ def EfficientNet(n_classes=3):
     return model
 
 class ReverseLayerF(Function):
+#这个类是为了实现domain adversarial，即在训练时，将特征图反向传播，使得模型学到的特征对目标域和源域都有效，从而提升跨域泛化能力。
+    @staticmethod #静态方法，不需要实例化即可调用
+    def forward(ctx, x, alpha):#x为输入，alpha为权重，即反向传播的权重
+        ctx.alpha = alpha #将权重保存在ctx中
+
+        return x.view_as(x) #返回输入的形状
 
     @staticmethod
-    def forward(ctx, x, alpha):
-        ctx.alpha = alpha
-
-        return x.view_as(x)
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        output = grad_output.neg() * ctx.alpha
+    def backward(ctx, grad_output): #反向传播
+        output = grad_output.neg() * ctx.alpha #将梯度乘以权重，再取反，neg()是取反的函数即是取负号
 
         return output, None
 
@@ -82,21 +82,22 @@ class Model_DA(torch.nn.Module):
     def __init__(self, model, n_databases):
         super(Model_DA, self).__init__()
         self.base_model = model
-        self.domain_classifier = torch.nn.Sequential()
-        dim_features = get_output_shape(self.base_model.features,(1, 3, 224, 224))
+        self.domain_classifier = torch.nn.Sequential() #令domain_classifier为一个空的序列
+        dim_features = get_output_shape(self.base_model.features,(1, 3, 224, 224)) #获取模型输出特征的长度
         print(f'Dim = {dim_features}')
-        self.domain_classifier.add_module('dc_l1',torch.nn.Linear(dim_features, 256))
-        self.domain_classifier.add_module('dc_l2',torch.nn.Linear(256, n_databases))
-
+        self.domain_classifier.add_module('dc_l1',torch.nn.Linear(dim_features, 256))#添加全连接层，输入为特征长度，输出为256
+        self.domain_classifier.add_module('dc_l2',torch.nn.Linear(256, n_databases))#添加全连接层，输入为256，输出为数据库数
+        #最终 domain_classifier 为一个两层的全连接层
     def forward(self, x):
         if self.training:
-            class_output = self.base_model(x)
-            feature = self.base_model.features(x)
-            feature = F.relu(feature, inplace=True)
-            feature = F.adaptive_avg_pool2d(feature, (1, 1))
-            feature = torch.flatten(feature,1)
+            class_output = self.base_model(x) 
+            feature = self.base_model.features(x) #获取特征的shape为(batch_size, num_channels, height, width)
+            feature = F.relu(feature, inplace=True) #激活函数
+            feature = F.adaptive_avg_pool2d(feature, (1, 1)) #自适应平均池化，（1，1）的意思是输出的特征图大小为1*1，所以输出的shape为 (batch_size, num_channels, 1, 1)
+            feature = torch.flatten(feature,1) #将特征图展平，shape为(batch_size, num_channels)
             reverse_feature = ReverseLayerF.apply(feature, 1)
-            domain_output = self.domain_classifier(reverse_feature)
+             #apply方法是自动调用forward和backward方法，得到的是反向传播的结果，shape为(batch_size, num_channels)
+            domain_output = self.domain_classifier(reverse_feature) #将特征传入domain_classifier，得到domain_output
             return class_output, domain_output
         else:
             class_output = self.base_model(x)

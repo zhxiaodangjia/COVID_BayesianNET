@@ -40,14 +40,14 @@ class COVIDxDataset(Dataset):
     """
 
     def __init__(self, mode, n_classes=3, dataset_path='./datasets', dim=(224, 224), pre_processing = 'None'):
-        self.root = str(dataset_path) #+ '/' + mode + '/'
+        self.root = str(dataset_path) + '/' + mode + '/'
 
         self.CLASSES = n_classes
         self.dim = dim
         self.COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
         self.pre_processing = pre_processing
-        testfile = 'COVID_BayesianNET/Experiment/test_split_fold_0.txt'
-        trainfile = 'COVID_BayesianNET/Experiment/train_split_fold_0.txt'
+        testfile = r'D:\UPM\bayesiannet\COVID_BayesianNET\data\test_split2.txt'
+        trainfile = r'D:\UPM\bayesiannet\COVID_BayesianNET\data\train_split2.txt'
         if (mode == 'train'):
             self.paths, self.labels, _ = read_filepaths(trainfile)
         elif (mode == 'test'):
@@ -63,12 +63,12 @@ class COVIDxDataset(Dataset):
         label_tensor = torch.tensor(self.COVIDxDICT[self.labels[index]], dtype=torch.long)
         image_tensor = image_tensor.numpy()
 
-        if ra.random()>0.5:
+        if ra.random()>0.5: #add noise to the image 随机加入高斯噪声
             image_tensor = random_noise(image_tensor, mode='gaussian', mean=0.015, var = 0.015)
             
         if ((label_tensor.numpy() == 2 and ra.random()>0.17) or (label_tensor.numpy() ==0 and ra.random()>0.5)) and self.mode == 'train':#apply data augmentation only for COVID:if label_tensor.numpy() == 2  and self.mode == 'train'
-            augmented_tensor = do_augmentation(image_tensor)
-            augmented_tensor = torch.from_numpy(augmented_tensor)
+            augmented_tensor = do_augmentation(image_tensor) 
+            augmented_tensor = torch.from_numpy(augmented_tensor) 
             augmented_tensor = torch.squeeze(augmented_tensor, dim=0)
             final_tensor = augmented_tensor
         else:
@@ -82,21 +82,23 @@ class COVIDxDataset(Dataset):
         if self.pre_processing == 'None':
             image = cv2.imread(img_path)
             img_adapteq = Image.fromarray(image.astype('uint8'), 'RGB')
-        elif self.pre_processing == 'Equalization':
+        elif self.pre_processing == 'Equalization': #直方图均衡化
             image = cv2.imread(img_path)
             image2 = np.copy(image)
-            image2[image2>0]=255
-            image2 = image2[:,:,0]
-            mask = Image.fromarray(image2.astype('uint8'))
-            img_adapteq = Image.fromarray(image.astype('uint8'), 'RGB')
-            img_adapteq = ImageOps.equalize(img_adapteq,mask=mask)
-        elif self.pre_processing == 'CLAHE':
-            clahe = cv2.createCLAHE(clipLimit=4,tileGridSize=(8,8))
-            image = cv2.imread(img_path, cv2.IMREAD_COLOR)
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2Lab)
-            image[:,:,0] = clahe.apply(image[:,:,0])
-            image = cv2.cvtColor(image, cv2.COLOR_Lab2RGB)
-            img_adapteq = Image.fromarray(image.astype('uint8'), 'RGB')
+            image2[image2>0]=255 # 将图像中大于0的像素值设为255，即将图像转换为二值图像
+            image2 = image2[:,:,0] # 将图像转换为灰度图，[:,:,0]表示取第一个通道,图像的shape为(512,512,3),转换后的shape为(512,512)，即灰度图
+            mask = Image.fromarray(image2.astype('uint8')) #将numpy数组转换为PIL图像
+            img_adapteq = Image.fromarray(image.astype('uint8'), 'RGB') #将numpy数组转换为PIL图像
+            img_adapteq = ImageOps.equalize(img_adapteq,mask=mask) #对图像进行直方图均衡化，生成的图像的亮度将会根据mask的亮度进行调整
+        elif self.pre_processing == 'CLAHE':#对比度受限的自适应直方图均衡化
+            clahe = cv2.createCLAHE(clipLimit=4,tileGridSize=(8,8)) #创建CLAHE对象，clipLimit为对比度的限制，tileGridSize为每个块的大小
+            image = cv2.imread(img_path, cv2.IMREAD_COLOR) #读取图像
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2Lab) #将图像转换为Lab颜色空间
+            image[:,:,0] = clahe.apply(image[:,:,0]) #对亮度通道进行CLAHE处理
+            image = cv2.cvtColor(image, cv2.COLOR_Lab2RGB) #将图像转换为RGB颜色空间
+            img_adapteq = Image.fromarray(image.astype('uint8'), 'RGB') #将numpy数组转换为PIL图像
+            #equalization 和 CLAHE 都是图像增强的方法 主要为了增加图像的对比度，使图像更加清晰，从而提高图像的识别率
+            #而transform是数据增强的方法，主要是为了增加数据的多样性，提高模型的泛化能力
 
         preprocess = transforms.Compose([
             transforms.Resize(self.dim[0]),
@@ -136,12 +138,13 @@ class COVIDxDataset_DA(Dataset):
         image_tensor = self.load_image(self.root + self.paths[index])
         label_tensor = self.COVIDxDICT[self.labels[index]]
         image_tensor = image_tensor.numpy()
-        label_db = DatasetDIC[self.paths[index].split("_")[0]]
+        label_db = DatasetDIC[self.paths[index].split("_")[0]] #get the dataset index，即数据集来源的索引
         labels = torch.tensor([label_tensor,label_db],dtype=torch.long)
         if ra.random()>0.5:
             image_tensor = random_noise(image_tensor, mode='gaussian', mean=0.015, var = 0.015)
             
-        if ((label_tensor == 2 and ra.random()>0.17) or (label_tensor ==0 and ra.random()>0.5)) and self.mode == 'train':#apply data augmentation only for COVID:if label_tensor.numpy() == 2  and self.mode == 'train'
+        if ((label_tensor == 2 and ra.random()>0.17) or (label_tensor ==0 and ra.random()>0.5)) and self.mode == 'train':
+            #训练集中只对COVID-19和肺炎进行数据增强,可能是类别不平衡
             augmented_tensor = do_augmentation(image_tensor)
             augmented_tensor = torch.from_numpy(augmented_tensor)
             augmented_tensor = torch.squeeze(augmented_tensor, dim=0)

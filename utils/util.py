@@ -17,7 +17,7 @@ def write_score(writer, iter, mode, metrics):
     writer.add_scalar(mode + '/acc', metrics.data['correct'] / metrics.data['total'], iter)
 
 
-def write_train_val_score(writer, epoch, train_stats, val_stats):
+def write_train_val_score(writer, epoch, train_stats, val_stats): #这是K-fold交叉验证的时候用的
     writer.add_scalars('Loss', {'train': train_stats[0],
                                 'val': val_stats[0],
                                 }, epoch)
@@ -43,8 +43,8 @@ def write_train_val_score(writer, epoch, train_stats, val_stats):
 
 def showgradients(model):
     for param in model.parameters():
-        print(type(param.data), param.size())
-        print("GRADS= \n", param.grad)
+        print(type(param.data), param.size()) #打印参数的类型和大小
+        print("GRADS= \n", param.grad) #打印参数的梯度
 
 def datestr():
     now = time.gmtime()
@@ -103,15 +103,15 @@ def make_dirs(path):
 def create_stats_files(path):
     train_f = open(os.path.join(path, 'train.csv'), 'w')
     val_f = open(os.path.join(path, 'val.csv'), 'w')
-    return train_f, val_f
+    return train_f, val_f #返回的是两个文件
 
 def read_json_file(fname):
     with open(fname, 'r') as handle:
-        return json.load(handle, object_hook=OrderedDict)
+        return json.load(handle, object_hook=OrderedDict) #返回的是一个有序字典
 
 def write_json_file(content, fname):
     with open(fname, 'w') as handle:
-        json.dump(content, handle, indent=4, sort_keys=False)
+        json.dump(content, handle, indent=4, sort_keys=False) #将content写入文件
 
 def read_filepaths(file):
     paths, labels, dbs = [], [], []
@@ -122,8 +122,9 @@ def read_filepaths(file):
             if ('/ c o' in line):
                 break
             #print(line)    
-            _, path, label = line.split(' ')
-            db = path.split('_')[0]
+            #_, path, label= line.split(' ')
+            #db = path.split('_')[0]
+            _, path, label, db = line.split(' ')
             paths.append(path)
             labels.append(label)
             dbs.append(db)
@@ -131,12 +132,13 @@ def read_filepaths(file):
     classes = np.unique(labes_array)
     for i in classes:
         print('Clase={}-Samples={}'.format(i, np.sum(labes_array == i)))
-    return paths, labels, dbs
+    return paths, labels, dbs #返回的是路径，标签，数据库
 
 def select_model(args,n_dbs=1):
     if args.model == 'BDenseNet':
         if args.init_from:
             model, bflag = BDenseNet(n_classes = args.classes, saved_model = args.saved_model), True
+            #输出的是一个贝叶斯模型，bfalg是一个标志位，True表示贝叶斯模型，False表示频率模型
         else:
             model, bflag = BDenseNet(args.classes), True #Flag: True: Bayesian model, False: Frequentist model
     elif args.model == 'DenseNet':
@@ -206,7 +208,7 @@ def ImportantOfContext(ReMap: np.array, Mask: np.array) -> float:
     IoC = (np.sum(Pout)/npout)/(np.sum(Pin)/npin)
     return IoC
 
-def confusion_matrix(nb_classes):
+def confusion_matrix(nb_classes):#nb_classes是类别数
 
     confusion_matrix = torch.zeros(nb_classes, nb_classes)
     with torch.no_grad():
@@ -255,7 +257,7 @@ class Metrics:
     
     def replace(self, values):
         for key in values:
-            self.data[key] = values[key]
+            self.data[key] = values[key]  
 
     def avg_acc(self):
         return self.data['correct'] / self.data['total']
@@ -270,6 +272,51 @@ class Metrics:
 
 def assign_free_gpus(threshold_vram_usage=1500, max_gpus=2, wait=False, sleep_time=10):
     """
+    Adjusted to work in environments without GPUs.
+    """
+    import subprocess
+    import os
+    import time
+
+    def _check():
+        try:
+            # Try to get GPU info using nvidia-smi
+            smi_query_result = subprocess.check_output(
+                "nvidia-smi -q -d Memory", shell=True
+            )
+            gpu_info = smi_query_result.decode("utf-8").split("\n")
+            gpu_info = list(filter(lambda info: "Used" in info, gpu_info))
+            gpu_info = [
+                int(x.split(":")[1].replace("MiB", "").strip()) for x in gpu_info
+            ]  # Parse memory usage
+            free_gpus = [
+                str(i) for i, mem in enumerate(gpu_info) if mem < threshold_vram_usage
+            ]
+            return free_gpus[: min(max_gpus, len(free_gpus))]
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            # If nvidia-smi fails, assume no GPU is available
+            print("No GPU detected or nvidia-smi not available. Using CPU.")
+            return []
+
+    while True:
+        gpus_to_use = _check()
+        if gpus_to_use or not wait:
+            break
+        print(f"No free GPUs found, retrying in {sleep_time}s")
+        time.sleep(sleep_time)
+
+    if not gpus_to_use:
+        # No GPU is available, disable GPU usage
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+        print("No free GPUs found. Using CPU only.")
+    else:
+        os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(gpus_to_use)
+        print(f"Using GPU(s): {','.join(gpus_to_use)}")
+
+"""
+def assign_free_gpus(threshold_vram_usage=1500, max_gpus=2, wait=False, sleep_time=10):
+    #这段代码是为了找到空闲的GPU，然后将其分配给当前进程
+    
     Assigns free gpus to the current process via the CUDA_AVAILABLE_DEVICES env variable
     This function should be called after all imports,
     in case you are setting CUDA_AVAILABLE_DEVICES elsewhere
@@ -283,7 +330,7 @@ def assign_free_gpus(threshold_vram_usage=1500, max_gpus=2, wait=False, sleep_ti
                                   Defaults to 2.
         wait (bool, optional): Whether to wait until a GPU is free. Default False.
         sleep_time (int, optional): Sleep time (in seconds) to wait before checking GPUs, if wait=True. Default 10.
-    """
+    
 
     def _check():
         # Get the list of GPUs via nvidia-smi
@@ -316,3 +363,4 @@ def assign_free_gpus(threshold_vram_usage=1500, max_gpus=2, wait=False, sleep_ti
     os.environ["CUDA_VISIBLE_DEVICES"] = gpus_to_use
     print(f"Using GPU(s): {gpus_to_use}")
     #logger.info(f"Using GPU(s): {gpus_to_use}")
+"""
