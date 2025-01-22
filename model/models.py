@@ -3,6 +3,7 @@ from torch.autograd import Function
 import torchvision
 import torch.nn.functional as F
 from bayesian_torch.models.dnn_to_bnn import dnn_to_bnn
+from model.covidnet import covidnet_large
 
 const_bnn_prior_parameters = {
         "prior_mu": 0.0,
@@ -13,6 +14,18 @@ const_bnn_prior_parameters = {
         "moped_enable": True,  # True to initialize mu/sigma from the pretrained dnn weights
         "moped_delta": 0.5,
 }
+
+def BcovidxNet(n_classes=3, saved_model = ''):
+    model = covidnet_large(n_classes)
+    
+    if saved_model:
+        checkpoint = torch.load(saved_model,map_location=torch.device('cpu'))
+        model.load_state_dict(checkpoint['state_dict'])
+    #Turn model into a Bayesian version (in place)
+    dnn_to_bnn(model, const_bnn_prior_parameters)
+
+    return model
+
 
 def get_output_shape(model, image_dim): #确定模型输出的特征尺寸
     feature = model(torch.rand(*image_dim)) # 随机生成一个输入传到模型中，shape = (batch_size, channels, height, width)
@@ -35,7 +48,7 @@ def BDenseNet(n_classes=3, saved_model = ''):
 def DenseNet(n_classes=3):
 
     model = torchvision.models.densenet121(weights='DEFAULT')
-    model.classifier = torch.nn.Linear(model.classifier.in_features, n_classes)
+    model.classifier = torch.nn.Linear(model.classifier.in_features, n_classes) 
     
     return model
 

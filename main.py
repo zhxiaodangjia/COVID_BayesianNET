@@ -2,7 +2,7 @@ import argparse
 import torch
 import numpy as np
 import utils.util as util
-from trainer.train import initialize, train, train_bayesian, validation, validation_bayesian
+from trainer.train_uncetain import initialize, train, train_bayesian, validation, validation_bayesian
 #from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import ReduceLROnPlateau #
 
@@ -31,7 +31,7 @@ def main():
     for epoch in range(1, args.nEpochs + 1): #就是根据不同的模式进行训练
         if bflag:
             train_bayesian(args, model, training_generator, optimizer, Last_epoch+epoch, weights)
-            val_metrics, confusion_matrix = validation_bayesian(args, model, val_generator, Last_epoch+epoch, weights)
+            val_metrics, confusion_matrix ,= validation_bayesian(args, model, val_generator, Last_epoch+epoch, weights)
         else:
             train(args, model, training_generator, optimizer, Last_epoch+epoch, weights)
             val_metrics, confusion_matrix = validation(args, model, val_generator, Last_epoch+epoch, weights)
@@ -49,7 +49,7 @@ def get_arguments():
                         help='load saved_model as initial model')
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--log_interval', type=int, default=1000) #每隔多少个batch打印一次
-    parser.add_argument('--dataset_name', type=str, default="COVIDx")
+    parser.add_argument('--dataset_name', type=str, default="selfdata")
     parser.add_argument('--nEpochs', type=int, default=24)
     parser.add_argument('--n_monte_carlo', type=int, default=20, help='number of Monte Carlo runs during training')
     parser.add_argument('--device', type=str, default='0')
@@ -60,16 +60,16 @@ def get_arguments():
                         help='learning rate (default: 1e-3)')
     parser.add_argument('--weight_decay', default=1e-7, type=float,
                         help='weight decay (default: 1e-6)')
-    #parser.add_argument('--cuda', action='store_true', default=True)#是否使用cuda!!要改
-    parser.add_argument('--cuda', action='store_true', default=False)#是否使用cuda!!要改
-    parser.add_argument('--model', type=str, default='DenseNet',
-                        choices=('DenseNet','BDenseNet','EfficientNet','BEfficientNet'))
+    parser.add_argument('--cuda', action='store_true', default=True)#是否使用cuda!!要改
+    #parser.add_argument('--cuda', action='store_true', default=False)#是否使用cuda!!要改
+    parser.add_argument('--model', type=str, default='BcovidxNet',
+                        choices=('DenseNet','BDenseNet','EfficientNet','BEfficientNet','BcovidxNet'),)
     parser.add_argument('--mode', type=str, default='None',
                         choices=('None','DA'),help='Domain adversarial with respect to the data bases') #是决定是否使用domain adversarial，因为数据来源不同，所以目的是使模型学到的特征对目标域和源域都有效，从而提升跨域泛化能力。
     parser.add_argument('--init_from', action='store_true', default=False, help='In case of Bayessian models, start from a pretrained non Bayesian model')
     parser.add_argument('--opt', type=str, default='adam',
                         choices=('sgd', 'adam', 'rmsprop'))
-    parser.add_argument('--dataset', type=str, default=r'D:\UPM\bayesiannet\COVID_BayesianNET\data',
+    parser.add_argument('--dataset', type=str, default='/home/huaxu@gaps_domain.ssr.upm.es/projects/COVID_BayesianNET/data',
                         help='path to dataset ')
     parser.add_argument('--pre_processing', type=str, default='None',
                         choices=('None','Equalization','CLAHE'))

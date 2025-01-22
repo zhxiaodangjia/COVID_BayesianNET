@@ -7,7 +7,7 @@ from collections import OrderedDict
 import json
 import torch.optim as optim
 import pandas as pd
-from model.models import BDenseNet, DenseNet, BEfficientNet, EfficientNet, Model_DA
+from model.models import BDenseNet, DenseNet, BEfficientNet, EfficientNet, Model_DA, BcovidxNet
 import csv
 import numpy as np
 
@@ -124,7 +124,13 @@ def read_filepaths(file):
             #print(line)    
             #_, path, label= line.split(' ')
             #db = path.split('_')[0]
-            _, path, label, db = line.split(' ')
+            line = line.strip()
+            parts = line.split()
+            if len(parts) != 4:
+                print(f"行格式不正确: '{line}'，字段数量: {len(parts)}")
+                continue  # 跳
+                path, label, db = parts
+            _, path, label, db = parts
             paths.append(path)
             labels.append(label)
             dbs.append(db)
@@ -150,6 +156,11 @@ def select_model(args,n_dbs=1):
             model, bflag = BEfficientNet(n_classes = args.classes, saved_model = args.saved_model), True
         else:
             model, bflag = BEfficientNet(n_classes = args.classes), True
+    elif args.model == 'BcovidxNet':
+        if args.init_from:
+            model, bflag = BcovidxNet(n_classes = args.classes, saved_model = args.saved_model), True
+        else:
+            model, bflag = BcovidxNet(n_classes = args.classes), True
 
     if args.mode == 'DA':
         return Model_DA(model,n_dbs), bflag

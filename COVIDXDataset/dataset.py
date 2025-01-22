@@ -46,8 +46,8 @@ class COVIDxDataset(Dataset):
         self.dim = dim
         self.COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
         self.pre_processing = pre_processing
-        testfile = r'D:\UPM\bayesiannet\COVID_BayesianNET\data\test_split2.txt'
-        trainfile = r'D:\UPM\bayesiannet\COVID_BayesianNET\data\train_split2.txt'
+        testfile = '/home/huaxu@gaps_domain.ssr.upm.es/projects/COVID_BayesianNET/data/test.txt'
+        trainfile = '/home/huaxu@gaps_domain.ssr.upm.es/projects/COVID_BayesianNET/data/train.txt'
         if (mode == 'train'):
             self.paths, self.labels, _ = read_filepaths(trainfile)
         elif (mode == 'test'):
@@ -122,8 +122,8 @@ class COVIDxDataset_DA(Dataset):
         self.dim = dim
         self.COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
         self.pre_processing = pre_processing
-        testfile = 'COVID_BayesianNET/Experiment/test_split_fold_0.txt'
-        trainfile = 'COVID_BayesianNET/Experiment/train_split_fold_0.txt'
+        testfile = '/home/huaxu@gaps_domain.ssr.upm.es/projects/COVID_BayesianNET/data/test.txt'
+        trainfile = '/home/huaxu@gaps_domain.ssr.upm.es/projects/COVID_BayesianNET/data/train.txt'
         if (mode == 'train'):
             self.paths, self.labels, self.dbs = read_filepaths(trainfile)
         elif (mode == 'test'):
