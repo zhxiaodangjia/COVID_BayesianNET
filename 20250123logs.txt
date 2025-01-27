@@ -1,0 +1,217 @@
+Using GPU(s): 0,1
+Clase=COVID-19-Samples=14000
+Clase=normal-Samples=14906
+Clase=pneumonia-Samples=10676
+train examples =  39582
+Clase=COVID-19-Samples=3000
+Clase=normal-Samples=3195
+Clase=pneumonia-Samples=2290
+test examples =  8485
+Checkpoint folder  COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005
+Epoch: 1	Sample:    1/39584	Loss:73.4601	Accuracy:0.22
+Epoch: 1	Sample: 4001/39584	Loss:1.6705	Accuracy:0.49
+Epoch: 1	Sample: 8001/39584	Loss:1.5577	Accuracy:0.59
+Epoch: 1	Sample:12001/39584	Loss:1.4752	Accuracy:0.64
+Epoch: 1	Sample:16001/39584	Loss:1.4209	Accuracy:0.67
+Epoch: 1	Sample:20001/39584	Loss:1.3707	Accuracy:0.69
+Epoch: 1	Sample:24001/39584	Loss:1.3270	Accuracy:0.71
+Epoch: 1	Sample:28001/39584	Loss:1.2916	Accuracy:0.72
+Epoch: 1	Sample:32001/39584	Loss:1.2606	Accuracy:0.73
+Epoch: 1	Sample:36001/39584	Loss:1.2346	Accuracy:0.74
+Training
+ SUMMARY EPOCH: 1	Sample:39553/39553	Loss:1.2137	Accuracy:0.75	BalancedAccuracy:0.02
+
+Validation
+ SUMMARY EPOCH: 1	Sample: 8481/ 8481	Loss:1.0787	Accuracy:0.79	BalancedAccuracy:0.02
+
+Predictive Entropy (mean): 0.6401259155290637
+Mutual Information (mean): 0.2769163793557404
+0.7734117309252421
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_best_checkpoint.pth.tar
+tensor([[1356.,  291.,  643.],
+        [  23., 3092.,   80.],
+        [  75.,  644., 2281.]])
+Epoch: 2	Sample:    1/39584	Loss:36.2887	Accuracy:0.56
+Epoch: 2	Sample: 4001/39584	Loss:0.9767	Accuracy:0.81
+Epoch: 2	Sample: 8001/39584	Loss:0.9651	Accuracy:0.81
+Epoch: 2	Sample:12001/39584	Loss:0.9521	Accuracy:0.81
+Epoch: 2	Sample:16001/39584	Loss:0.9447	Accuracy:0.82
+Epoch: 2	Sample:20001/39584	Loss:0.9365	Accuracy:0.82
+Epoch: 2	Sample:24001/39584	Loss:0.9259	Accuracy:0.83
+Epoch: 2	Sample:28001/39584	Loss:0.9192	Accuracy:0.83
+Epoch: 2	Sample:32001/39584	Loss:0.9109	Accuracy:0.83
+Epoch: 2	Sample:36001/39584	Loss:0.9051	Accuracy:0.83
+Training
+ SUMMARY EPOCH: 2	Sample:39553/39553	Loss:0.8995	Accuracy:0.83	BalancedAccuracy:0.03
+
+Validation
+ SUMMARY EPOCH: 2	Sample: 8481/ 8481	Loss:1.0157	Accuracy:0.85	BalancedAccuracy:0.03
+
+Predictive Entropy (mean): 0.5650414328195835
+Mutual Information (mean): 0.27305443653184736
+0.8448349833488464
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_best_checkpoint.pth.tar
+tensor([[1747.,  324.,  219.],
+        [  11., 3148.,   36.],
+        [  77.,  564., 2359.]])
+Epoch: 3	Sample:    1/39584	Loss:26.9568	Accuracy:0.84
+Epoch: 3	Sample: 4001/39584	Loss:0.8475	Accuracy:0.85
+Epoch: 3	Sample: 8001/39584	Loss:0.8372	Accuracy:0.86
+Epoch: 3	Sample:12001/39584	Loss:0.8281	Accuracy:0.86
+Epoch: 3	Sample:16001/39584	Loss:0.8266	Accuracy:0.86
+Epoch: 3	Sample:20001/39584	Loss:0.8241	Accuracy:0.86
+Epoch: 3	Sample:24001/39584	Loss:0.8216	Accuracy:0.86
+Epoch: 3	Sample:28001/39584	Loss:0.8187	Accuracy:0.86
+Epoch: 3	Sample:32001/39584	Loss:0.8138	Accuracy:0.86
+Epoch: 3	Sample:36001/39584	Loss:0.8091	Accuracy:0.86
+Training
+ SUMMARY EPOCH: 3	Sample:39553/39553	Loss:0.8076	Accuracy:0.86	BalancedAccuracy:0.03
+
+Validation
+ SUMMARY EPOCH: 3	Sample: 8481/ 8481	Loss:1.1364	Accuracy:0.86	BalancedAccuracy:0.03
+
+Predictive Entropy (mean): 0.5516547490141067
+Mutual Information (mean): 0.29538406672124223
+0.8398558298746744
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_last_checkpoint.pth.tar
+tensor([[1517.,  113.,  660.],
+        [  23., 2976.,  196.],
+        [  26.,  197., 2777.]])
+Epoch: 4	Sample:    1/39584	Loss:21.0892	Accuracy:0.94
+Epoch: 4	Sample: 4001/39584	Loss:0.8158	Accuracy:0.88
+Epoch: 4	Sample: 8001/39584	Loss:0.7989	Accuracy:0.88
+Epoch: 4	Sample:12001/39584	Loss:0.7872	Accuracy:0.88
+Epoch: 4	Sample:16001/39584	Loss:0.7861	Accuracy:0.88
+Epoch: 4	Sample:20001/39584	Loss:0.7834	Accuracy:0.88
+Epoch: 4	Sample:24001/39584	Loss:0.7802	Accuracy:0.88
+Epoch: 4	Sample:28001/39584	Loss:0.7765	Accuracy:0.88
+Epoch: 4	Sample:32001/39584	Loss:0.7713	Accuracy:0.88
+Epoch: 4	Sample:36001/39584	Loss:0.7665	Accuracy:0.88
+Training
+ SUMMARY EPOCH: 4	Sample:39553/39553	Loss:0.7658	Accuracy:0.87	BalancedAccuracy:0.03
+
+Validation
+ SUMMARY EPOCH: 4	Sample: 8481/ 8481	Loss:1.0767	Accuracy:0.88	BalancedAccuracy:0.03
+
+Predictive Entropy (mean): 0.533073414675242
+Mutual Information (mean): 0.28123953986388694
+0.8705897927284241
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_best_checkpoint.pth.tar
+tensor([[1721.,  196.,  373.],
+        [   9., 3134.,   52.],
+        [  23.,  339., 2638.]])
+Epoch: 5	Sample:    1/39584	Loss:21.5084	Accuracy:0.78
+Epoch: 5	Sample: 4001/39584	Loss:0.7290	Accuracy:0.86
+Epoch: 5	Sample: 8001/39584	Loss:0.7392	Accuracy:0.88
+Epoch: 5	Sample:12001/39584	Loss:0.7420	Accuracy:0.88
+Epoch: 5	Sample:16001/39584	Loss:0.7403	Accuracy:0.88
+Epoch: 5	Sample:20001/39584	Loss:0.7342	Accuracy:0.88
+Epoch: 5	Sample:24001/39584	Loss:0.7325	Accuracy:0.88
+Epoch: 5	Sample:28001/39584	Loss:0.7284	Accuracy:0.88
+Epoch: 5	Sample:32001/39584	Loss:0.7267	Accuracy:0.88
+Epoch: 5	Sample:36001/39584	Loss:0.7264	Accuracy:0.88
+Training
+ SUMMARY EPOCH: 5	Sample:39553/39553	Loss:0.7276	Accuracy:0.88	BalancedAccuracy:0.03
+
+Validation
+ SUMMARY EPOCH: 5	Sample: 8481/ 8481	Loss:1.2037	Accuracy:0.88	BalancedAccuracy:0.03
+
+Predictive Entropy (mean): 0.5158815627494941
+Mutual Information (mean): 0.2955422237784792
+0.8626669049263
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_last_checkpoint.pth.tar
+tensor([[1641.,   83.,  566.],
+        [   8., 2962.,  225.],
+        [  23.,  144., 2833.]])
+Epoch: 6	Sample:    1/39584	Loss:25.1628	Accuracy:0.94
+Epoch: 6	Sample: 4001/39584	Loss:0.7108	Accuracy:0.86
+Epoch: 6	Sample: 8001/39584	Loss:0.7144	Accuracy:0.86
+Epoch: 6	Sample:12001/39584	Loss:0.7172	Accuracy:0.87
+Epoch: 6	Sample:16001/39584	Loss:0.7159	Accuracy:0.86
+Epoch: 6	Sample:20001/39584	Loss:0.7162	Accuracy:0.87
+Epoch: 6	Sample:24001/39584	Loss:0.7149	Accuracy:0.87
+Epoch: 6	Sample:28001/39584	Loss:0.7164	Accuracy:0.88
+Epoch: 6	Sample:32001/39584	Loss:0.7170	Accuracy:0.88
+Epoch: 6	Sample:36001/39584	Loss:0.7136	Accuracy:0.88
+Training
+ SUMMARY EPOCH: 6	Sample:39553/39553	Loss:0.7115	Accuracy:0.88	BalancedAccuracy:0.03
+
+Validation
+ SUMMARY EPOCH: 6	Sample: 8481/ 8481	Loss:1.3166	Accuracy:0.86	BalancedAccuracy:0.03
+
+Predictive Entropy (mean): 0.48476594257471006
+Mutual Information (mean): 0.29396844087032126
+0.8410980304082235
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_last_checkpoint.pth.tar
+tensor([[1423.,   83.,  784.],
+        [   6., 3069.,  120.],
+        [  15.,  161., 2824.]])
+Epoch: 7	Sample:    1/39584	Loss:19.2961	Accuracy:0.97
+Epoch: 7	Sample: 4001/39584	Loss:0.6876	Accuracy:0.87
+Epoch: 7	Sample: 8001/39584	Loss:0.6909	Accuracy:0.89
+Epoch: 7	Sample:12001/39584	Loss:0.6850	Accuracy:0.90
+Epoch: 7	Sample:16001/39584	Loss:0.6841	Accuracy:0.89
+Epoch: 7	Sample:20001/39584	Loss:0.6831	Accuracy:0.89
+Epoch: 7	Sample:24001/39584	Loss:0.6850	Accuracy:0.89
+Epoch: 7	Sample:28001/39584	Loss:0.6852	Accuracy:0.89
+Epoch: 7	Sample:32001/39584	Loss:0.6831	Accuracy:0.89
+Epoch: 7	Sample:36001/39584	Loss:0.6811	Accuracy:0.89
+Training
+ SUMMARY EPOCH: 7	Sample:39553/39553	Loss:0.6816	Accuracy:0.89	BalancedAccuracy:0.03
+
+Validation
+ SUMMARY EPOCH: 7	Sample: 8481/ 8481	Loss:1.1007	Accuracy:0.90	BalancedAccuracy:0.03
+
+Predictive Entropy (mean): 0.47825146815266456
+Mutual Information (mean): 0.27610738221061737
+0.8854318261146545
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_best_checkpoint.pth.tar
+tensor([[1750.,  111.,  429.],
+        [   8., 3108.,   79.],
+        [  21.,  221., 2758.]])
+Epoch: 8	Sample:    1/39584	Loss:21.1359	Accuracy:0.81
+Epoch: 8	Sample: 4001/39584	Loss:0.6854	Accuracy:0.90
+Epoch: 8	Sample: 8001/39584	Loss:0.6736	Accuracy:0.90
+Epoch: 8	Sample:12001/39584	Loss:0.6727	Accuracy:0.89
+Epoch: 8	Sample:16001/39584	Loss:0.6681	Accuracy:0.89
+Epoch: 8	Sample:20001/39584	Loss:0.6700	Accuracy:0.90
+Epoch: 8	Sample:24001/39584	Loss:0.6708	Accuracy:0.90
+Epoch: 8	Sample:28001/39584	Loss:0.6732	Accuracy:0.90
+Epoch: 8	Sample:32001/39584	Loss:0.6738	Accuracy:0.90
+Epoch: 8	Sample:36001/39584	Loss:0.6730	Accuracy:0.90
+Training
+ SUMMARY EPOCH: 8	Sample:39553/39553	Loss:0.6733	Accuracy:0.90	BalancedAccuracy:0.03
+
+Validation
+ SUMMARY EPOCH: 8	Sample: 8481/ 8481	Loss:1.2542	Accuracy:0.84	BalancedAccuracy:0.03
+
+Predictive Entropy (mean): 0.453353140758706
+Mutual Information (mean): 0.25491622139905656
+0.8192081848780314
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_last_checkpoint.pth.tar
+tensor([[1275.,   83.,  932.],
+        [   4., 3071.,  120.],
+        [   5.,  176., 2819.]])
+Epoch: 9	Sample:    1/39584	Loss:21.3942	Accuracy:0.94
+Epoch: 9	Sample: 4001/39584	Loss:0.6665	Accuracy:0.90
+Epoch: 9	Sample: 8001/39584	Loss:0.6693	Accuracy:0.90
+Epoch: 9	Sample:12001/39584	Loss:0.6615	Accuracy:0.91
+Epoch: 9	Sample:16001/39584	Loss:0.6642	Accuracy:0.90
+Epoch: 9	Sample:20001/39584	Loss:0.6632	Accuracy:0.90
+Epoch: 9	Sample:24001/39584	Loss:0.6654	Accuracy:0.90
+Epoch: 9	Sample:28001/39584	Loss:0.6656	Accuracy:0.89
+Epoch: 9	Sample:32001/39584	Loss:0.6653	Accuracy:0.89
+Epoch: 9	Sample:36001/39584	Loss:0.6655	Accuracy:0.89
+Training
+ SUMMARY EPOCH: 9	Sample:39553/39553	Loss:0.6658	Accuracy:0.89	BalancedAccuracy:0.03
+
+Validation
+ SUMMARY EPOCH: 9	Sample: 8481/ 8481	Loss:0.8371	Accuracy:0.92	BalancedAccuracy:0.03
+
+Predictive Entropy (mean): 0.45575077980729656
+Mutual Information (mean): 0.2626489633599652
+0.9106423060099283
+COVID_BayesianNET/models_saved/BcovidxNet_20250122_2005/BcovidxNet_best_checkpoint.pth.tar
+tensor([[1890.,   61.,  339.],
+        [  11., 3100.,   84.],
+        [  34.,  157., 2809.]])
